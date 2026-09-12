@@ -305,7 +305,9 @@ npm run typecheck
 npm run build   # writes lambda/handler.zip
 ```
 
-CI rebuilds `handler.zip` on changes under `src/`. Commit the zip so consumers get a working module without a separate build step.
+`npm install` also installs the repository's Husky pre-commit hook. When staged changes affect `src/`, `package.json`, `package-lock.json`, or `tsconfig.json`, the hook rebuilds `handler.zip` deterministically and compares it with the staged artifact. If the ZIP changes, the commit stops so you can review it, stage `lambda/handler.zip`, and commit again. The hook also rejects partially staged bundle inputs; stage or stash those changes before committing.
+
+You can bypass local hooks with `git commit --no-verify`, but CI runs the same artifact check and rejects a stale ZIP. Commit the ZIP so Terraform Registry consumers receive a working module without a separate build step.
 
 ## License
 

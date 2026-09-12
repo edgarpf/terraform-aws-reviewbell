@@ -5,6 +5,8 @@
   "description": "ReviewBell Lambda — GitHub PR notifications to Slack",
   "scripts": {
     "build": "esbuild src/index.ts --bundle --platform=node --target=node24 --outfile=dist/index.js --format=cjs --minify && touch -t 198001010000 dist/index.js && mkdir -p lambda && cd dist && zip -X -q -FS ../lambda/handler.zip index.js",
+    "check:lambda-artifact": "npm run build && git diff --exit-code -- lambda/handler.zip",
+    "prepare": "husky",
     "typecheck": "tsc --noEmit && tsc --noEmit -p tsconfig.tests.json",
     "test": "npm run test:unit && npm run test:contract",
     "test:unit": "vitest run tests/unit",
@@ -27,6 +29,7 @@
     "@types/node": "24.0.0",
     "@vitest/coverage-v8": "4.1.11",
     "esbuild": "0.25.0",
+    "husky": "9.1.7",
     "msw": "2.15.0",
     "testcontainers": "12.1.0",
     "typescript": "5.8.3",

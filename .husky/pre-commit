@@ -1,0 +1,22 @@
+#!/usr/bin/env sh
+
+bundle_inputs='src package.json package-lock.json tsconfig.json'
+staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
+
+if ! printf '%s\n' "$staged_files" | grep -Eq '^(src/|package(-lock)?\.json$|tsconfig\.json$)'; then
+  exit 0
+fi
+
+if ! git diff --quiet -- $bundle_inputs || [ -n "$(git ls-files --others --exclude-standard -- src)" ]; then
+  echo >&2 'ReviewBell: Lambda bundle inputs are only partially staged.'
+  echo >&2 'Stage or stash all changes under src/ and to package.json, package-lock.json, and tsconfig.json, then commit again.'
+  exit 1
+fi
+
+echo 'ReviewBell: verifying lambda/handler.zip...'
+
+if ! npm run check:lambda-artifact; then
+  echo >&2 'ReviewBell: lambda/handler.zip was stale and has been rebuilt.'
+  echo >&2 'Review the artifact, stage lambda/handler.zip, and commit again.'
+  exit 1
+fi

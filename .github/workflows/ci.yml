@@ -28,16 +28,12 @@ jobs:
       - run: npm ci
       - run: npm run typecheck
       - run: npm run test:coverage
-      - run: npm run build
+      - run: npm run check:lambda-artifact
 
       - name: Verify bundled Lambda artifact
         run: |
           unzip -t lambda/handler.zip
           unzip -l lambda/handler.zip | grep -q 'index.js'
-          if ! git diff --exit-code -- lambda/handler.zip; then
-            echo "lambda/handler.zip is stale — rebuild and commit it"
-            exit 1
-          fi
 
   terraform:
     name: terraform
